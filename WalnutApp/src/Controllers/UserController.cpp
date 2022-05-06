@@ -1,6 +1,4 @@
-﻿#include <iostream>
-#include <assert.h>
-//#include <json.hpp>
+﻿#include "pch.h"
 
 #include "UserController.h"
 #include "Data/Day.h"
@@ -27,7 +25,7 @@ void UserController::RemoveDayByIndex(int index)
 {
     if(index < 0 || index > mTotalDays.size())
     {
-        assert(false && "Invalid index");
+        //TODO: create custom asserts
     }
 
     mTotalDays.erase(mTotalDays.begin() + index);

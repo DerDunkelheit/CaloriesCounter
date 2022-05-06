@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include <Walnut/Application.h>
 #include <Walnut/EntryPoint.h>
 #include <Walnut/Image.h>
@@ -7,7 +9,6 @@
 #include "Controllers/UserController.h"
 #include "Controllers/AppBehaviourController.h"
 
-//TODO: precompile header.
 //TODO: disable docking for Layout
 
 class ApplicationLayer : public Walnut::Layer
@@ -62,7 +63,24 @@ public:
                     if (ImGui::BeginTabItem("Description"))
                     {
                         ImGui::TextWrapped(mUserController->GetDay(selected)->GetConsumedInfoShort().c_str());
+
+                        static char proteinsBuffer[64] = "";
+                        ImGui::PushItemWidth(200);
+                        ImGui::InputTextWithHint("Add Proteins", "Consumed proteins", proteinsBuffer, sizeof(proteinsBuffer), ImGuiInputTextFlags_CharsScientific);
+                        static char carbohydratesBuffer[64] = "";
+                        ImGui::PushItemWidth(200);
+                        ImGui::InputTextWithHint("Add CarbohydratesBuffer", "Consumed carbohydrates", carbohydratesBuffer, sizeof(carbohydratesBuffer), ImGuiInputTextFlags_CharsScientific);
+                        static char fatsBuffer[64] = "";
+                        ImGui::PushItemWidth(200);
+                        ImGui::InputTextWithHint("Add Fats", "Consumed fats", fatsBuffer, sizeof(fatsBuffer), ImGuiInputTextFlags_CharsScientific);
+
+                        if (ImGui::Button("Add meal"))
+                        {
+                            int test = 0;
+                        }
+
                         ImGui::EndTabItem();
+                        
                     }
                     if (ImGui::BeginTabItem("Details"))
                     {
@@ -109,9 +127,13 @@ Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-            if (ImGui::MenuItem("Help window"))
+            if (ImGui::MenuItem("Import stats"))
             {
-                AppManager::GetAppBehController()->SetRenderHelpWindowBool(true);
+                GuiUtils::OpenFile();
+            }
+            if (ImGui::MenuItem("Export stats"))
+            {
+                //TODO: export stats in csv format.
             }
 			if (ImGui::MenuItem("Exit"))
 			{
@@ -119,6 +141,14 @@ Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
 			}
 			ImGui::EndMenu();
 		}
+        if (ImGui::BeginMenu("Help"))
+        {
+            if (ImGui::MenuItem("Help window"))
+            {
+                AppManager::GetAppBehController()->SetRenderHelpWindowBool(true);
+            }
+            ImGui::EndMenu();
+        }
 	});
 	return app;
 }

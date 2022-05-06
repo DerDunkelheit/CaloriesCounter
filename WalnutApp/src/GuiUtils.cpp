@@ -1,9 +1,9 @@
-﻿#include<iostream>
+﻿#include "pch.h"
+
 #include <tchar.h>
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
-#include <windows.h>
 
 #include "imgui.h"
 #include "GuiUtils.h"
@@ -11,6 +11,7 @@
 #include "Controllers/AppManager.h"
 #include "Controllers/AppBehaviourController.h"
 
+//TODO: callback for importing csv file.
 void GuiUtils::OpenFile()
 {
     wchar_t filename[MAX_PATH];
@@ -58,7 +59,7 @@ void GuiUtils::OpenFile()
 
 void GuiUtils::RenderHelpWindow()
 {
-    ImGui::Begin("Help window", nullptr, (ImGuiWindowFlags_NoCollapse));
+    ImGui::Begin("Help window", nullptr, (ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking));
 
     ImGui::Text("some text, user guide i'm alex, what to write idk just test \nsome new text on new line\none more line");
     ImGui::NewLine();

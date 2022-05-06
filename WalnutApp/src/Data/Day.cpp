@@ -1,6 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <numeric>
+#include "pch.h"
 
 #include "Day.h"
 #include "Meal.h"

@@ -5,6 +5,9 @@ project "WalnutApp"
    targetdir "bin/%{cfg.buildcfg}"
    staticruntime "off"
 
+   pchheader "pch.h"
+   pchsource "src/pch.cpp"
+
    files 
    {
       "src/**.h", "src/**.cpp",

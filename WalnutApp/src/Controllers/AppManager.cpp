@@ -1,4 +1,6 @@
-﻿#include "AppManager.h"
+﻿#include "pch.h"
+
+#include "AppManager.h"
 #include "UserController.h"
 #include "AppBehaviourController.h"
 #include "SaveLoadController.h"

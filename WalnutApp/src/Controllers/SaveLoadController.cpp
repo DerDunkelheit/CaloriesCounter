@@ -1,6 +1,4 @@
-#include <Windows.h>
-#include <iostream>
-#include <fstream>
+#include "pch.h"
 
 #include "SaveLoadController.h"
 
@@ -10,7 +8,7 @@ const std::string SaveLoadController::SAVE_EXTENSION = ".json";
 
 SaveLoadController::SaveLoadController()
 {
-    //Path to exe.
+    //Path to exe.//TODO: get it from plfatform specific interface.
     char buffer[MAX_PATH];
     GetModuleFileNameA(nullptr, buffer, MAX_PATH);
     std::string fullPath = std::string(buffer);
