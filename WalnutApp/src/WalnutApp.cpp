@@ -9,11 +9,18 @@
 #include "Controllers/UserController.h"
 #include "Controllers/AppBehaviourController.h"
 
+#include "Debug/DebugData.h"
+
 //TODO: disable docking for Layout
 
 class ApplicationLayer : public Walnut::Layer
 {
 public:
+    ApplicationLayer(DebugData* debugData)
+    {
+        mDebugData = debugData;
+    }
+
     virtual void OnAttach() override
     {
         AppManager::Init();
@@ -30,6 +37,7 @@ public:
 
 	virtual void OnUIRender() override
 	{
+        static int selected = 0;
         if (ImGui::Begin("Days statictic"))
         {
             if (ImGui::Button("Add day", ImVec2(150, 0)))
@@ -38,7 +46,6 @@ public:
             }
 
             // Left
-            static int selected = 0;
             {
                 ImGui::BeginChild("left pane", ImVec2(150, 0), true);
                 for (int i = 0; i < mUserController->GetTotalDays(); i++)
@@ -60,23 +67,39 @@ public:
                 ImGui::Separator();
                 if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
                 {
+                    Day* currentDay = mUserController->GetDay(selected);
+
                     if (ImGui::BeginTabItem("Description"))
                     {
-                        ImGui::TextWrapped(mUserController->GetDay(selected)->GetConsumedInfoShort().c_str());
 
-                        static char proteinsBuffer[64] = "";
-                        ImGui::PushItemWidth(200);
-                        ImGui::InputTextWithHint("Add Proteins", "Consumed proteins", proteinsBuffer, sizeof(proteinsBuffer), ImGuiInputTextFlags_CharsScientific);
-                        static char carbohydratesBuffer[64] = "";
-                        ImGui::PushItemWidth(200);
-                        ImGui::InputTextWithHint("Add CarbohydratesBuffer", "Consumed carbohydrates", carbohydratesBuffer, sizeof(carbohydratesBuffer), ImGuiInputTextFlags_CharsScientific);
-                        static char fatsBuffer[64] = "";
-                        ImGui::PushItemWidth(200);
-                        ImGui::InputTextWithHint("Add Fats", "Consumed fats", fatsBuffer, sizeof(fatsBuffer), ImGuiInputTextFlags_CharsScientific);
-
-                        if (ImGui::Button("Add meal"))
+                        if (currentDay != nullptr)
                         {
-                            int test = 0;
+                            ImGui::TextWrapped(currentDay->GetConsumedInfoShort().c_str());
+
+                            //TODO: prevent negative int
+                            static int proteins = 0;
+                            ImGui::PushItemWidth(200);
+                            ImGui::InputInt("Add Proteins", &proteins, -1,-1);
+                            static int carbohydrates = 0;
+                            ImGui::PushItemWidth(200);
+                            ImGui::InputInt("Add Carbohydrates", &carbohydrates);
+                            static int fats = 0;
+                            ImGui::PushItemWidth(200);
+                            ImGui::InputInt("Add Fats", &fats);
+
+                            if (ImGui::Button("Add meal"))
+                            {
+                                if (proteins > 0 || carbohydrates > 0 || fats > 0)
+                                {
+                                    currentDay->AddMeal(proteins, carbohydrates, fats);
+
+                                    proteins = 0;
+                                    carbohydrates = 0;
+                                    fats = 0;
+                                }
+
+                                std::cout << currentDay->GetMealCout() << std::endl;
+                            }
                         }
 
                         ImGui::EndTabItem();
@@ -84,7 +107,74 @@ public:
                     }
                     if (ImGui::BeginTabItem("Details"))
                     {
-                        ImGui::Text("ID: 0123456789");
+                        if (currentDay != nullptr)
+                        {
+                            // When using ScrollX or ScrollY we need to specify a size for our table container!
+                            // Otherwise by default the table will fit all available space, like a BeginChild() call.
+                            static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+                            ImVec2 outer_size = ImVec2(0.0f, ImGui::GetTextLineHeightWithSpacing() * 8);
+                            if (ImGui::BeginTable("table_scrolly", 5, flags, outer_size))
+                            {
+                                ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
+                                ImGui::TableSetupColumn("Days", ImGuiTableColumnFlags_None);
+                                ImGui::TableSetupColumn("Total calories", ImGuiTableColumnFlags_None);
+                                ImGui::TableSetupColumn("Proteins", ImGuiTableColumnFlags_None);
+                                ImGui::TableSetupColumn("Carbohydrates", ImGuiTableColumnFlags_None);
+                                ImGui::TableSetupColumn("Fats", ImGuiTableColumnFlags_None);
+                                ImGui::TableHeadersRow();
+
+                                // Demonstrate using clipper for large vertical lists
+                                ImGuiListClipper clipper;
+                                clipper.Begin(static_cast<int>(mUserController->GetAllDays().size()));
+                                while (clipper.Step())
+                                {
+                                    for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; row++)
+                                    {
+                                        ImGui::TableNextRow();
+                                        for (int column = 0; column < 5; column++)
+                                        {
+                                            ImGui::TableSetColumnIndex(column);
+                                            switch (column)
+                                            {
+                                                case 0:
+                                                {
+                                                    ImGui::Text("Day %d", row);
+                                                    ImGui::SameLine();
+                                                    ImGui::Button("copy");
+                                                    if (ImGui::IsItemClicked())
+                                                    {
+                                                        std::cout << row << std::endl;
+                                                    }
+                                                    break;
+                                                }
+                                                case 1:
+                                                {
+                                                    ImGui::Text("Calories: %d", mUserController->GetAllDays()[row].GetTotalCalories());
+                                                    break;
+                                                }
+                                                case 2:
+                                                {
+                                                    ImGui::Text("Proteins: %d", mUserController->GetAllDays()[row].GetConsumedProteins());
+                                                    break;
+                                                }
+                                                case 3:
+                                                {
+                                                    ImGui::Text("Carbohydrates: %d", mUserController->GetAllDays()[row].GetConsumedCarbohydrates());
+                                                    break;
+                                                }
+                                                case 4:
+                                                {
+                                                    ImGui::Text("Fats: %d", mUserController->GetAllDays()[row].GetConsumedFats());
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                ImGui::EndTable();
+                            }
+                        }
+
                         ImGui::EndTabItem();
                     }
                     ImGui::EndTabBar();
@@ -108,12 +198,22 @@ public:
 
 #ifdef WL_DEBUG
         ImGui::ShowDemoWindow();
+        GuiUtils::RenderDebugWindow(mDebugData, selected, *mUserController);
 #endif
 	}
+
+    virtual void OnDetach()
+    {
+        delete(mUserController);
+        delete(mAppBehController);
+        delete(mDebugData);
+    }
 
 private:
     UserController* mUserController = nullptr;
     AppBehaviourController* mAppBehController = nullptr;
+
+    DebugData* mDebugData = nullptr;
 };
 
 Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
@@ -122,8 +222,10 @@ Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
 	spec.Name = "Calories Counter";
 
 	Walnut::Application* app = new Walnut::Application(spec);
-	app->PushLayer<ApplicationLayer>();
-	app->SetMenubarCallback([app]()
+    DebugData* debugData = new DebugData();
+    std::shared_ptr<ApplicationLayer> appLayer = std::make_shared<ApplicationLayer>(debugData);
+	app->PushLayer(appLayer);
+	app->SetMenubarCallback([app, debugData]()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
@@ -149,6 +251,16 @@ Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
             }
             ImGui::EndMenu();
         }
+#ifdef WL_DEBUG
+        if (ImGui::BeginMenu("Debug"))
+        {
+            if (ImGui::MenuItem("Debug Window"))
+            {
+                debugData->RenderWindow = true;
+            }
+            ImGui::EndMenu();
+        }
+#endif
 	});
 	return app;
 }

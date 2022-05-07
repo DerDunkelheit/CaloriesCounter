@@ -10,6 +10,7 @@
 
 #include "Controllers/AppManager.h"
 #include "Controllers/AppBehaviourController.h"
+#include "Data/Day.h"
 
 //TODO: callback for importing csv file.
 void GuiUtils::OpenFile()
@@ -71,4 +72,32 @@ void GuiUtils::RenderHelpWindow()
     }
 
     ImGui::End();
+}
+
+void GuiUtils::RenderDebugWindow(DebugData* debugData, int selectedDayIndex, UserController& userController)
+{
+    if (debugData->RenderWindow)
+    {
+        ImGui::Begin("DebugWindow", &debugData->RenderWindow, ImGuiWindowFlags_NoCollapse);
+            if(ImGui::Button("Add 10 Days"))
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    userController.AddDay();
+                }
+            }
+
+            Day* selectedDay = userController.GetDay(selectedDayIndex);
+            if (selectedDay != nullptr)
+            {
+                ImGui::Text("Selected Day index %d", selectedDayIndex);
+                ImGui::SameLine();
+                if (ImGui::Button("Add Meal"))
+                {
+                    selectedDay->AddMeal(50, 50, 50);
+                }
+            }
+
+        ImGui::End();
+    }
 }
