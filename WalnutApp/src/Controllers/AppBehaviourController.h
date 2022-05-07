@@ -30,4 +30,6 @@ private:
     bool mShouldRenderAddNewMealWindow = false;
     //TODO: marko for default int value??
     int mSelectedDayIndex = -1;
+
+    bool mIsFirstLaunch = true;
 };

@@ -16,6 +16,11 @@ void AppBehaviourController::Initialize()
 {
     LoadData();
 
+    if (mIsFirstLaunch)
+    {
+        SetRenderHelpWindowBool(true);
+    }
+
     std::cout << "AppBehaviourController is Initialized" << std::endl;
 }
 
@@ -43,6 +48,7 @@ void AppBehaviourController::SaveData()
     nlohmann::json save;
     save["shouldRenderHelpWindow"] = mShouldRenderHelpWindow;
     save["selectedDayIndex"] = mSelectedDayIndex;
+    save["firstLaunch"] = false;
     SaveLoadController* saveLoad = AppManager::GetController<SaveLoadController>();
     if (saveLoad->IsSaveFileExist(SAVE_FILE_NAME))
     {
@@ -70,6 +76,7 @@ void AppBehaviourController::LoadData()
         json j = json::parse(file);
         mShouldRenderHelpWindow = j["shouldRenderHelpWindow"].get<bool>();
         mSelectedDayIndex = j["selectedDayIndex"].get<int>();
+        mIsFirstLaunch = j["firstLaunch"].get<bool>();
         file.close();
     }
 }
