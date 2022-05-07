@@ -20,6 +20,9 @@ public:
     int GetMealCout() const;
     void AddMeal(int proteins, int carbohydrates, int fats);
     std::string GetConsumedInfoShort();
+    
+    std::vector<Meal>::iterator begin() { return mConsumedMeals.begin(); }
+    std::vector<Meal>::iterator end() { return mConsumedMeals.end(); }
 private:
     std::vector<Meal> mConsumedMeals;
 };

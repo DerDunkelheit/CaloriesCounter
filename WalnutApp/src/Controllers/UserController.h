@@ -21,10 +21,12 @@ public:
     //Test
     Day& GetFirstDay() { return mTotalDays[0]; }
 
+    void SaveData();
 private:
     void LoadData();
-    void SaveData();
 
 private:
+    static const std::string SAVE_FILE_NAME;
+
     std::vector<Day> mTotalDays;
 };

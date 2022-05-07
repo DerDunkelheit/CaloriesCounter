@@ -69,7 +69,7 @@ std::string Day::GetConsumedInfoShort()
     int proteins = GetConsumedProteins();
     int fats = GetConsumedFats();
     char buff[256];
-    snprintf(buff, sizeof(buff), "Consumed callories: %d carbohydrates: %d proteins: %d fats: %d", totalCalories, carbohydrates, proteins, fats);
+    snprintf(buff, sizeof(buff), "Consumed callories: %d, carbohydrates: %d, proteins: %d, fats: %d", totalCalories, carbohydrates, proteins, fats);
     std::string info = buff;
 
     return info;
