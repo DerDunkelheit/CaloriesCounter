@@ -12,6 +12,7 @@
 #include "Debug/DebugData.h"
 
 //TODO: disable docking for Layout
+//TODO: display days from 1 instead of 0
 
 class ApplicationLayer : public Walnut::Layer
 {
@@ -98,12 +99,21 @@ public:
 
                                 std::cout << currentDay->GetMealCout() << std::endl;
                             }
+                            ImGui::SameLine();
+                            if (ImGui::Button("Remove last meal"))
+                            {
+                                if (currentDay->GetMealCout() > 0)
+                                {
+                                    currentDay->RemoveLastMeal();
+                                    mUserController->SaveData();
+                                }
+                            }
                         }
 
                         ImGui::EndTabItem();
                         
                     }
-                    if (ImGui::BeginTabItem("Details"))
+                    if (ImGui::BeginTabItem("All Days stat"))
                     {
                         if (currentDay != nullptr)
                         {
@@ -142,6 +152,10 @@ public:
                                                     if (ImGui::IsItemClicked())
                                                     {
                                                         std::cout << row << std::endl;
+                                                        const Day& copyDay = mUserController->GetAllDays()[row];
+                                                        ImGui::LogToClipboard();
+                                                        ImGui::LogText("Day:%d, Calories: %d, Proteins: %d, Carbohydrates: %d, Fats: %d", row, copyDay.GetTotalCalories(), copyDay.GetConsumedProteins(), copyDay.GetConsumedCarbohydrates(), copyDay.GetConsumedFats());
+                                                        ImGui::LogFinish();
                                                     }
                                                     break;
                                                 }
@@ -188,8 +202,6 @@ public:
                         return mUserController->RemoveDayByIndex(selected);
                     });
 
-                ImGui::SameLine();
-                if (ImGui::Button("Save")) {}
                 ImGui::EndGroup();
             }
         }
