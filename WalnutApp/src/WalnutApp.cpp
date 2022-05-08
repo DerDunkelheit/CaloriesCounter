@@ -27,12 +27,6 @@ public:
         
         mUserController = AppManager::GetController<UserController>();
         mAppBehController = AppManager::GetController<AppBehaviourController>();
-
-        //TODO: for testing, remove in final version.
-        for (int i = 0; i < 10; i++)
-        {
-            mUserController->AddDay();
-        }
     }
 
 	virtual void OnUIRender() override
@@ -71,15 +65,14 @@ public:
 
                     if (ImGui::BeginTabItem("Description"))
                     {
-
                         if (currentDay != nullptr)
                         {
                             ImGui::TextWrapped(currentDay->GetConsumedInfoShort().c_str());
 
-                            //TODO: prevent negative int
+                            //TODO: prevent negative int instead of this.
                             static int proteins = 0;
                             ImGui::PushItemWidth(200);
-                            ImGui::InputInt("Add Proteins", &proteins, -1,-1);
+                            ImGui::InputInt("Add Proteins", &proteins);
                             static int carbohydrates = 0;
                             ImGui::PushItemWidth(200);
                             ImGui::InputInt("Add Carbohydrates", &carbohydrates);
@@ -92,10 +85,15 @@ public:
                                 if (proteins > 0 || carbohydrates > 0 || fats > 0)
                                 {
                                     currentDay->AddMeal(proteins, carbohydrates, fats);
+                                    mUserController->SaveData();
 
                                     proteins = 0;
                                     carbohydrates = 0;
                                     fats = 0;
+                                }
+                                else
+                                {
+                                    std::cout << "Invalid Input" << std::endl;
                                 }
 
                                 std::cout << currentDay->GetMealCout() << std::endl;
@@ -180,7 +178,16 @@ public:
                     ImGui::EndTabBar();
                 }
                 ImGui::EndChild();
-                if (ImGui::Button("Revert")) {}
+                if (ImGui::Button("Remove Day"))
+                {
+                    ImGui::OpenPopup("Delete?");
+                }
+
+                GuiUtils::RenderRemoveDayPopup("Delete?", [this]() 
+                    {
+                        return mUserController->RemoveDayByIndex(selected);
+                    });
+
                 ImGui::SameLine();
                 if (ImGui::Button("Save")) {}
                 ImGui::EndGroup();

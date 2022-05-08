@@ -11,4 +11,5 @@ namespace GuiUtils
 
     void RenderHelpWindow();
     void RenderDebugWindow(DebugData* debugData, int selectedDayIndex, UserController& userController);
+    void RenderRemoveDayPopup(const char* popupName, std::function<void()> positiveCallback);
 }

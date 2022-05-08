@@ -101,3 +101,29 @@ void GuiUtils::RenderDebugWindow(DebugData* debugData, int selectedDayIndex, Use
         ImGui::End();
     }
 }
+
+void GuiUtils::RenderRemoveDayPopup(const char* popupName, std::function<void()> positiveCallback)
+{
+    // Always center this window when appearing
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal(popupName, NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Are you sure want to delete selected day?\nThis operation cannot be undone!\n\n");
+        ImGui::Separator();
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+        ImGui::PopStyleVar();
+
+        if (ImGui::Button("OK", ImVec2(120, 0)))
+        {
+            positiveCallback();
+            ImGui::CloseCurrentPopup(); 
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+        ImGui::EndPopup();
+    }
+}
